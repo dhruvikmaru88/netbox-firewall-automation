@@ -1,0 +1,31 @@
+name: Firewall Rule Validation
+
+on:
+  push:
+    paths:
+      - "requests/**"
+
+jobs:
+  validate-firewall-rule:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pyyaml
+
+      - name: Validate firewall request
+        env:
+          NETBOX_URL: ${{ secrets.NETBOX_URL }}
+          NETBOX_TOKEN: ${{ secrets.NETBOX_TOKEN }}
+        run: |
+          python scripts/validate_firewall_rule.py requests/FW-001.yml
